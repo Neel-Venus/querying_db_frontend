@@ -9,12 +9,14 @@ interface SimpleQueryBuilderProps {
   onResults: (results: any) => void
   query?: any
   onQueryChange?: (query: any) => void
+  onPageChange?: (page: number) => void
 }
 
 export function SimpleQueryBuilder({
   onResults,
   query: controlledQuery,
   onQueryChange,
+  onPageChange,
 }: SimpleQueryBuilderProps) {
   const [localQuery, setLocalQuery] = useState({
     collection: "google_findings",

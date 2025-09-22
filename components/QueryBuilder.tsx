@@ -80,6 +80,28 @@ export function QueryBuilder() {
     executeQuery.mutate(query)
   }
 
+  const handlePageChange = (page: number) => {
+    const updatedQuery = { ...query, page }
+    setQuery(updatedQuery)
+    setIsExecuting(true)
+    executeQuery.mutate(updatedQuery)
+  }
+
+  const handleSimplePageChange = (page: number) => {
+    const updatedSimpleQuery = { ...simpleQuery, page }
+    setSimpleQuery(updatedSimpleQuery)
+    // Execute the simple query with the new page
+    api
+      .post("/query/simple-query", updatedSimpleQuery)
+      .then((response) => {
+        setResults(response.data)
+        toast.success("Query executed successfully")
+      })
+      .catch((error) => {
+        toast.error(error.response?.data?.message || "Query execution failed")
+      })
+  }
+
   const handlePredefinedQuery = (predefinedQuery: any) => {
     setQuery({
       collection: predefinedQuery.collection,
@@ -204,6 +226,7 @@ export function QueryBuilder() {
               onResults={setResults}
               query={simpleQuery}
               onQueryChange={setSimpleQuery}
+              onPageChange={handleSimplePageChange}
             />
           ) : (
             <div className="card">
@@ -431,7 +454,12 @@ export function QueryBuilder() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Query Results
           </h2>
-          <QueryResults data={results} />
+          <QueryResults
+            data={results}
+            onPageChange={
+              activeTab === "simple" ? handleSimplePageChange : handlePageChange
+            }
+          />
         </div>
       )}
     </div>

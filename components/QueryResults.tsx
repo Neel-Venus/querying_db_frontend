@@ -13,11 +13,10 @@ interface QueryResultsProps {
     hasPrevPage: boolean
     executionTime: number
   }
+  onPageChange?: (page: number) => void
 }
 
-export function QueryResults({ data }: QueryResultsProps) {
-  const [currentPage, setCurrentPage] = useState(data.page)
-
+export function QueryResults({ data, onPageChange }: QueryResultsProps) {
   if (!data.data || data.data.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">No results found</div>
@@ -39,9 +38,8 @@ export function QueryResults({ data }: QueryResultsProps) {
       {/* Results Summary */}
       <div className="flex items-center justify-between text-sm text-gray-600">
         <span>
-          Showing {(currentPage - 1) * data.limit + 1} to{" "}
-          {Math.min(currentPage * data.limit, data.total)} of {data.total}{" "}
-          results
+          Showing {(data.page - 1) * data.limit + 1} to{" "}
+          {Math.min(data.page * data.limit, data.total)} of {data.total} results
         </span>
         <span>Executed in {data.executionTime}ms</span>
       </div>
@@ -82,19 +80,27 @@ export function QueryResults({ data }: QueryResultsProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              onClick={() => {
+                const newPage = Math.max(1, data.page - 1)
+                if (onPageChange) {
+                  onPageChange(newPage)
+                }
+              }}
               disabled={!data.hasPrevPage}
               className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
             >
               Previous
             </button>
             <span className="text-sm text-gray-600">
-              Page {currentPage} of {data.totalPages}
+              Page {data.page} of {data.totalPages}
             </span>
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(data.totalPages, prev + 1))
-              }
+              onClick={() => {
+                const newPage = Math.min(data.totalPages, data.page + 1)
+                if (onPageChange) {
+                  onPageChange(newPage)
+                }
+              }}
               disabled={!data.hasNextPage}
               className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
             >
